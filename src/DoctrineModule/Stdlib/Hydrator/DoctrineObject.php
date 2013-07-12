@@ -176,6 +176,10 @@ class DoctrineObject extends AbstractHydrator
             // Ignore unknown fields
             if (!in_array($getter, $methods)) {
                 continue;
+            if (!$this->getFilter()->filter($fieldName)) {
+                continue;
+            }
+
             }
 
             $data[$fieldName] = $this->extractValue($fieldName, $object->$getter());
@@ -197,7 +201,11 @@ class DoctrineObject extends AbstractHydrator
         $refl       = $this->metadata->getReflectionClass();
 
         $data = array();
+
         foreach ($fieldNames as $fieldName) {
+            if (!$this->getFilter()->filter($fieldName)) {
+                continue;
+            }
             $reflProperty = $refl->getProperty($fieldName);
             $reflProperty->setAccessible(true);
 

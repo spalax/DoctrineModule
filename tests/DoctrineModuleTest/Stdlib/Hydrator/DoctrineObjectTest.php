@@ -247,6 +247,40 @@ class DoctrineObjectTest extends BaseTestCase
         $this->hydratorByReference = new DoctrineObjectHydrator($this->objectManager, 'DoctrineModuleTest\Stdlib\Hydrator\Asset\OneToManyEntity', false);
     }
 
+    public function testFiltrateSuccessWhileExtractingSimpleEntityByValue()
+    {
+        $entity = new Asset\SimpleEntity();
+        $entity->setId(2);
+        $entity->setField('foo', false);
+
+        $this->configureObjectManagerForSimpleEntity();
+
+        $hydrator = $this->hydratorByValue;
+        $hydrator->addFilter('filter', function ($fieldName){
+           return $fieldName != 'id';
+        });
+
+        $data = $hydrator->extract($entity);
+        $this->assertEquals(array('field' => 'From getter: foo'), $data);
+    }
+
+    public function testFiltrateSuccessWhileExtractingSimpleEntityByReference()
+    {
+        $entity = new Asset\SimpleEntity();
+        $entity->setId(2);
+        $entity->setField('foo', false);
+
+        $this->configureObjectManagerForSimpleEntity();
+
+        $hydrator = $this->hydratorByReference;
+        $hydrator->addFilter('filter', function ($fieldName){
+            return $fieldName != 'id';
+        });
+
+        $data = $hydrator->extract($entity);
+        $this->assertEquals(array('field' => 'foo'), $data);
+    }
+
     public function testCanExtractSimpleEntityByValue()
     {
         // When using extraction by value, it will use the public API of the entity to retrieve values (getters)
